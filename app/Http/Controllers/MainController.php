@@ -26,10 +26,19 @@ class MainController extends Controller
 
         // get selected operations
         $operations = [];
-        $operations[] = $request->check_sum ? 'sum' : '';
-        $operations[] = $request->check_subtraction ? 'subtraction' : '';
-        $operations[] = $request->check_multiplication ? 'multiplication' : '';
-        $operations[] = $request->check_division ? 'division' : '';
+
+        if ($request->check_sum) {
+            $operations[] = 'sum';
+        }
+        if ($request->check_subtraction) {
+            $operations[] = 'subtraction';
+        }
+        if ($request->check_multiplication) {
+            $operations[] = 'multiplication';
+        }
+        if ($request->check_division) {
+            $operations[] = 'division';
+        }
 
         // get numbers (min and max)
         $min = $request->number_one;
@@ -58,16 +67,28 @@ class MainController extends Controller
                     $sollution = $number1 - $number2;
                     break;
                 case 'multiplication':
-                    $exercise = "$number1 * $number2 =";
+                    $exercise = "$number1 x $number2 =";
                     $sollution = $number1 * $number2;
                     break;
                 case 'division':
-                    $exercise = "$number1 / $number2 =";
+
+                    // avoid division by zero
+                    if ($number2 == 0) {
+                        $number2 = 1;
+                    }
+
+                    $exercise = "$number1 : $number2 =";
                     $sollution = $number1 / $number2;
                     break;
             }
 
+            // if $solution is a float number, round it to 2 decimal places
+            if (is_float($sollution)) {
+                $sollution = round($sollution, 2);
+            }
+
             $exercises[] = [
+                'operation' => $operation,
                 'exercise_number' => $index,
                 'exercise' => $exercise,
                 'sollution' => "$exercise $sollution"
