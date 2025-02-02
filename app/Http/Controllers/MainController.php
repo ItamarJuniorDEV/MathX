@@ -49,51 +49,12 @@ class MainController extends Controller
 
         // generate exercises
         $exercises = [];
-        for ($index = 1; $index <= $number_exercises; $index++) {
-            $operation = $operations[array_rand($operations)];
-            $number1 = rand($min, $max);
-            $number2 = rand($min, $max);
-
-            $exercise = '';
-            $sollution = '';
-
-            switch ($operation) {
-                case 'sum':
-                    $exercise = "$number1 + $number2 =";
-                    $sollution = $number1 + $number2;
-                    break;
-                case 'subtraction':
-                    $exercise = "$number1 - $number2 =";
-                    $sollution = $number1 - $number2;
-                    break;
-                case 'multiplication':
-                    $exercise = "$number1 x $number2 =";
-                    $sollution = $number1 * $number2;
-                    break;
-                case 'division':
-
-                    // avoid division by zero
-                    if ($number2 == 0) {
-                        $number2 = 1;
-                    }
-
-                    $exercise = "$number1 : $number2 =";
-                    $sollution = $number1 / $number2;
-                    break;
-            }
-
-            // if $solution is a float number, round it to 2 decimal places
-            if (is_float($sollution)) {
-                $sollution = round($sollution, 2);
-            }
-
-            $exercises[] = [
-                'operation' => $operation,
-                'exercise_number' => $index,
-                'exercise' => $exercise,
-                'sollution' => "$exercise $sollution"
-            ];
+        for ($i = 1; $i <= $number_exercises; $i++) {
+            $exercises[] = $this->generateExercise($i, $operations, $min, $max);
         }
+
+        // place exercises in session
+        session(['exercises' => $exercises]);
 
         return view('operations', ['exercises' => $exercises]);
     }
@@ -106,5 +67,52 @@ class MainController extends Controller
     public function exportExercises()
     {
         echo 'Exportar exercícios para um arquivo de texto';
+    }
+
+    private function generateExercise($i, $operations, $min, $max): array
+    {
+        $operation = $operations[array_rand($operations)];
+        $number1 = rand($min, $max);
+        $number2 = rand($min, $max);
+
+        $exercise = '';
+        $sollution = '';
+
+        switch ($operation) {
+            case 'sum':
+                $exercise = "$number1 + $number2 =";
+                $sollution = $number1 + $number2;
+                break;
+            case 'subtraction':
+                $exercise = "$number1 - $number2 =";
+                $sollution = $number1 - $number2;
+                break;
+            case 'multiplication':
+                $exercise = "$number1 x $number2 =";
+                $sollution = $number1 * $number2;
+                break;
+            case 'division':
+
+                // avoid division by zero
+                if ($number2 == 0) {
+                    $number2 = 1;
+                }
+
+                $exercise = "$number1 : $number2 =";
+                $sollution = $number1 / $number2;
+                break;
+        }
+
+        // if $solution is a float number, round it to 2 decimal places
+        if (is_float($sollution)) {
+            $sollution = round($sollution, 2);
+        }
+
+        return [
+            'operation' => $operation,
+            'exercise_number' => $i,
+            'exercise' => $exercise,
+            'sollution' => "$exercise $sollution"
+        ];
     }
 }
